@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang = "en">
+    <head>
+        <meta charset = "utf-8">
+
+        <!-- CSS -->
+        <link rel = "stylesheet" href = "/static/css/fiku.css" />
+        <link rel = "stylesheet" href = "/static/css/fiku_new.css" />
+        {% block css %}{% endblock %}
+
+        <!-- Icon and title -->
+        <link rel = "icon" type = "image/png" href = "/static/favicon.png" />
+        <title>{{ title or "Fiku" }}</title>
+    </head>
+    <body>
+        {% block content %}{% endblock %}
+
+        <!-- Footer -->
+        <div id = "footer">
+            <div id = "left-side">
+                <a href = "/about">About</a>
+            </div>
+            <div id = "notch">
+                <a href = "/"><img style = "display: block;" src = "/static/favicon.png" /></a>
+            </div>
+            <div id = "right-side">
+                <span><input id = "searchinput" placeholder = "Search for an album, artist or track..." /></span>
+            </div>
+        </div>
+
+        <!-- JS -->
+        {% block js %}{% endblock %}
+    </body>
+</html>

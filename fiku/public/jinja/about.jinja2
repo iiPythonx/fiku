@@ -1,0 +1,26 @@
+{% extends "base.jinja2" %}
+{% block content %}
+    <table class = "top_info">
+        <tr>
+            <td class = "image">
+                <div style = "background-image: url('/static/favicon.png');"></div>
+            </td>
+            <td class = "text">
+                <h1 class = "headerwithextra">Fiku</h1>
+                <br />
+                <span>Version 1.0</span>
+            </td>
+        </tr>
+    </table>
+
+    Get your own Fiku server:
+    <div class = "divider"></div>
+    <a href = "https://github.com/iiPythonx/fiku" class = "hidelink">
+        <img src = "https://img.shields.io/github/v/tag/iiPythonx/fiku?label=GitHub&style=for-the-badge" />
+    </a>
+    <a href = "https://pypi.org/project/fikuserver/" class = "hidelink">
+        <img src = "https://img.shields.io/pypi/v/fikuserver?label=PyPI&style=for-the-badge" />
+    </a>
+    <div class = "divider"></div>
+    Fiku is released under the <a class = "textlink" href = "https://github.com/iiPythonx/fiku/blob/master/LICENSE">GNU General Public License v3.0</a>. <br>
+{% endblock %}

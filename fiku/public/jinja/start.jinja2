@@ -1,66 +1,55 @@
+{% extends "base.jinja2" %}
 {% from "macros/top_chart.jinja2" import chart with context %}
 
-<!doctype html>
-<html lang = "en">
-    <head>
-        <meta charset = "utf-8">
-        <link rel = "stylesheet" href = "/static/css/fiku.css" />
-        <link rel = "stylesheet" href = "/static/css/fiku_new.css" />
-        <title>Fiku</title>
-    </head>
-    <body>
-        <h1><a href = "/scrobbles">Last Scrobbles</a></h1>
-        <table class = "list">
-            <tbody>
-                {% for scrobble in db.get_recent_scrobbles() %}
-                    <tr>
-                        <td class = "time">{{ format_time(scrobble["listened_at"]) }}</td>
-                        <td class = "icon">
-                            <div class = "lazy entered loaded" style = "background-image: url('/image?artist={{ scrobble['artist_name'] }}&track={{ scrobble['track_name'] }}');"></div>
-                        </td>
-                        <td class = "track">
-                            <span class = "artist_in_trackcolumn">
-                            <a href = "/artist?artist={{ scrobble['artist_name'] }}">{{ scrobble["artist_name"] }}</a></span> &#8211; 
-                            <a href = "/track?artist={{ scrobble['artist_name'] }}&track={{ scrobble['track_name'] }}">{{ scrobble["track_name"] }}</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{#- CSS -#}
+{% block css %}
+    <link rel = "stylesheet" href = "/static/css/startpage.css" />
+{% endblock %}
+
+{#- Startpage -#}
+{% block content %}
+    <div id = "startpage">
+
+        <!-- Top charts -->
         {{ chart("artist", "Top Artists") }}
         {{ chart("track", "Top Tracks") }}
         {{ chart("album", "Top Albums") }}
 
-        <!-- JS -->
-        <script>
-            const escape = (t) => t.split("'").join("\\'").split("\"").join("\\\"");
-            for (const stat of document.getElementsByClassName("stat-select")) {
-                stat.addEventListener("click", async (e) => {
-                    const itemType = stat.parentElement.getAttribute("data-item-type");
-                    const tiles = stat.parentElement.getElementsByTagName("div")[0];
-                    tiles.innerHTML = "";
+        <!-- Pulse -->
+        <section data-item-type = "pulse"  style = "grid-area: pulse;">
+            <h1><a href = "/pulse">Pulse</a></h1>
+            <span class = "stat-select" data-timespan = "day">12 days</span> |
+            <span class = "stat-select" data-timespan = "week">12 weeks</span> |
+            <span class = "stat-select" data-timespan = "month">12 months</span> |
+            <span class = "stat-select" data-timespan = "year">12 years</span>
+            <table class = "list"></table>
+        </section>
 
-                    // Make request
-                    const resp = await (await fetch(`/api/top_items?item_type=${itemType}&timespan=${stat.getAttribute('data-timespan')}`)).json();
-                    for (let i = 0; i < resp.data.length; i++) {
-                        let query = `artist=${escape(resp.data[i].artist)}`;
-                        if (itemType !== "artist") query += `&${itemType}=${escape(resp.data[i][itemType])}`;
+        <!-- Last scrobbles -->
+        <section style = "grid-area: lastscrobbles;">
+            <h1><a href = "/scrobbles">Last Scrobbles</a></h1>
+            <table class = "list">
+                <tbody>
+                    {% for scrobble in db.get_recent_scrobbles() %}
+                        <tr>
+                            <td class = "time">{{ format_time(scrobble["listened_at"]) }}</td>
+                            <td class = "icon">
+                                <div class = "lazy entered loaded" style = "background-image: url('/image?artist={{ scrobble['artist_name'] }}&track={{ scrobble['track_name'] }}');"></div>
+                            </td>
+                            <td class = "track">
+                                <span class = "artist_in_trackcolumn">
+                                <a href = "/artist?artist={{ scrobble['artist_name'] }}">{{ scrobble["artist_name"] }}</a></span> &#8211; 
+                                <a href = "/track?artist={{ scrobble['artist_name'] }}&track={{ scrobble['track_name'] }}">{{ scrobble["track_name"] }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+{% endblock %}
 
-                        // Create actual tile
-                        const tile = document.createElement("div");
-                        tile.classList.add("tile");
-                        tile.innerHTML = `
-                            <a href = "/${itemType}?${query}">
-                                <div class = "lazy entered loaded" style = "background-image: url('/image?${query}');">
-                                    <span class = "stats">#${i + 1}</span>
-                                    <span>${resp.data[i][itemType]}</span> 
-                                </div>
-                            </a>
-                        `;
-                        tiles.appendChild(tile);
-                    }
-                });
-            }
-        </script>
-    </body>
-</html>
+{#- JS -#}
+{% block js %}
+    <script src = "/static/js/start.js"></script>
+{% endblock %}

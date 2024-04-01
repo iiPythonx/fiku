@@ -427,7 +427,7 @@ div#footer {
 }
 
 #notch img {
-  --notch-img-size: 80px;
+  --notch-img-size: 55px;
   position: absolute;
   top: calc((var(--notch-size) - var(--notch-img-size)) / 2);
   left: calc((var(--notch-size) - var(--notch-img-size)) / 2);

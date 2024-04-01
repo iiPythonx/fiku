@@ -1,6 +1,9 @@
-.tiles {
-    margin-top: 20px;
+.tiles, table.list {
+    margin-top: 18px;
 }
 span.stat-select {
     cursor: pointer;
+}
+div.divider {
+    margin-top: 18px;
 }

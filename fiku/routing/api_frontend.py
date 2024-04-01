@@ -37,9 +37,12 @@ templates = Jinja2Templates(
 async def load_index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "start.jinja2")
 
+@app.get("/about")
+async def load_about(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "about.jinja2")
+
 @app.get("/image")
 async def load_image(
-    request: Request,
     artist: str,
     album: str | None = None,
     track: str | None = None

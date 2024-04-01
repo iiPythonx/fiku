@@ -91,6 +91,17 @@ class FikuDB():
             }
             for x in self.cursor.fetchall()
         ]
+    
+    def get_pulse(
+        self,
+        lower_bound: int,
+        upper_bound: int
+    ) -> int:
+        self.cursor.execute(
+            "SELECT COUNT(*) FROM scrobbles WHERE listened_at BETWEEN ? and ?",
+            (lower_bound, upper_bound)
+        )
+        return self.cursor.fetchone()[0]
 
     # Handle authorization
     def get_authorization(self, service: str) -> str | None:
