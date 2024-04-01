@@ -1,0 +1,36 @@
+{% macro chart(type, title) -%}
+    <section data-item-type = "{{ type }}">
+        <h1><a href = "/charts_{{ type }}s">{{ title }}</a></h1>
+        <span class = "stat-select" data-timespan = "day">Today</span> |
+        <span class = "stat-select" data-timespan = "week">This Week</span> |
+        <span class = "stat-select" data-timespan = "month">This Month</span> |
+        <span class = "stat-select" data-timespan = "year">This Year</span> |
+        <span class = "stat-select" data-timespan = "all" style = "opacity: 0.5;">All Time</span>
+        <div class = "tiles">
+            {% set tiles = db.get_top_items(type) %}
+            {% for item in tiles %}
+                <div class = "tile">
+
+                    {#-
+                        All links require an artist name AND either a album name or a track title.
+                        This if statement creates the query parameter for the album or track (since we always provide artist).
+                    #}
+                    {% set query = "artist={}".format(item["artist"]) %}
+                    {% if type != "artist" %}
+                        {% set query = query + "&{}={}".format(type, item[type]).replace("'", "\\'") %}
+                    {% endif %}
+
+                    {#- Create the tile (thanks to the query we made) #}
+                    <a href = "/{{ type }}?{{ query }}">
+                        <div class = "lazy entered loaded" style = "background-image: url('/image?{{ query }}');">
+                            <span class = "stats">#{{ loop.index }}</span> <span>{{ item[type] }}</span> 
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+            {% for _ in range(14 - tiles | length) %}
+                <div></div>
+            {% endfor %}
+        </div>
+    </section>
+{%- endmacro %}
