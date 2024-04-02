@@ -70,3 +70,20 @@ async def api_pulse(timespan: Timespan = "day") -> JSONResponse:
         "code": 200,
         "data": results
     })
+
+@app.get("/api/artist")
+async def api_artist(artist: str) -> JSONResponse:
+    scrobble_count = db.get_scrobbles_of(artist, "artist", artist)
+    if not scrobble_count:
+        return JSONResponse({"code": 404, "data": None}, status_code = 404)
+
+    top_artists = [x["artist"] for x in db.get_top_items("artist")]
+    return JSONResponse({
+        "code": 200,
+        "data": {
+            "top_tracks": db.get_top_tracks(artist),
+            "placement": None if artist not in top_artists else top_artists.index(artist) + 1,
+            "total_scrobbles": scrobble_count,
+            "albums": db.get_artist_albums(artist)
+        }
+    })

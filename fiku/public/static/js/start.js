@@ -1,4 +1,3 @@
-const escape = (t) => t.split("'").join("\\'").split("\"").join("\\\"");
 const show_stat = async (type, timespan) => {
     const stat = document.querySelectorAll(`section[data-item-type = "${type}"] > span[data-timespan = "${timespan}"]`)[0];
     for (const other_stat of document.querySelectorAll(`section[data-item-type = "${type}"] span`)) other_stat.style.opacity = "1";

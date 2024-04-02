@@ -67,6 +67,37 @@ class FikuDB():
             for scrobble in self.cursor.fetchall()
         ]
     
+    def get_scrobbles_of(
+        self,
+        artist: str,
+        item_type: Literal["artist", "track", "album"],
+        item_name: str
+    ) -> int:
+        item_type = {"artist": "artist_name", "track": "track_name", "album": "release_name"}[item_type]
+
+        # Send off SQL query
+        extra = f"AND {item_type} = ?" if item_type != "artist" else ""
+        self.cursor.execute(
+            f"SELECT COUNT(*) FROM scrobbles WHERE artist_name = ? {extra}",
+            (artist, item_name) if item_type != "artist" else (artist,)
+        )
+        return self.cursor.fetchone()[0]
+
+    def get_artist_albums(self, artist: str) -> List[str]:
+        self.cursor.execute("SELECT release_name FROM scrobbles WHERE artist_name = ? GROUP BY release_name", (artist,))
+        return [x["release_name"] for x in self.cursor.fetchall()]
+
+    def get_top_tracks(self, artist: str, album: str | None = None) -> List[dict]:
+        extra = "AND release_name = ?" if album is not None else ""
+        self.cursor.execute(
+            f"SELECT track_name, release_name, COUNT(*) as count FROM scrobbles WHERE artist_name = ? {extra} GROUP BY track_name ORDER BY COUNT(track_name) DESC LIMIT 16",
+            (artist,) if album is None else (artist, album)
+        )
+        return [
+            {"track": x["track_name"], "album": x["release_name"], "count": x["count"]}
+            for x in self.cursor.fetchall()
+        ]
+
     def get_top_items(
         self,
         item_type: Literal["artist", "track", "album"],

@@ -1,0 +1,126 @@
+{% extends "base.jinja2" %}
+
+{#- Artist page -#}
+{% block content %}
+    <table class = "top_info">
+        <tbody>
+            <tr>
+                <td class = "image">
+                    <div class = "shiny alwaysshiny" style = "background-image: url('/image?artist={{ escape(artist) }}');"></div>
+                </td>
+                <td class = "text">
+                    <h1 id = "main_entity_name" class = "headerwithextra">{{ artist }}</h1>
+                    <span class = "rank">
+                        <a href = "/charts_artists?max=100" id = "placement"></a>
+                    </span>
+                    <br />
+                    <p class = "stats">
+                        <a href = "/scrobbles?artist={{ escape(artist) }}" id = "scrobble-count"></a>
+                    </p>
+                    <span class = "spacer"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Album list -->
+    <h2><a href = "/charts_albums?artist={{ escape(artist) }}">Albums</a></h2>
+    <div id = "showcase_container"></div>
+
+    <!-- Top tracks -->
+    <h2><a href = "/charts_tracks?artist={{ escape(artist) }}">Top Tracks</a></h2>
+    <table class = "list">
+		<tbody id = "top_tracks"></tbody>
+    </table>
+{% endblock %}
+
+{#- JS -#}
+{% block js %}
+    <script>
+        const showcase = document.getElementById("showcase_container");
+        const top_tracks = document.getElementById("top_tracks");
+
+        // Handle albums
+        function add_album(artist, album) {
+            const q = `artist=${escape(artist)}&album=${escape(album)}`;
+
+            // Create album element
+            const element = document.createElement("table");
+            element.classList.add("album");
+            element.innerHTML = `
+            <tbody>
+                <tr><td>&nbsp;</td></tr>
+                <tr>
+                    <td>
+                        <a href = "/album?${q}">
+                            <div class = "shiny alwaysshiny" style = "background-image: url('/image?${q}');"></div>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class = "album_artists">
+                            <a href = "/artist?artist=${escape(artist)}">${artist}</a>
+                        </span>
+                        <br />
+                        <span class = "album_title">
+                            <a href = "/album?${q}">${album}</a>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>`;
+            showcase.appendChild(element);
+        }
+
+        // Entrypoint
+        (async () => {
+            const resp = await (await fetch(`/api/artist?artist=${query.artist}`)).json();
+            if (resp.code !== 200) return alert("Artist not found.");
+
+            // Load albums
+            const data = resp.data;
+            for (const album of data.albums) add_album(query.artist, album);
+
+            // Placement and scrobble count
+            document.getElementById("scrobble-count").innerText = `${data.total_scrobbles} Scrobbles`;
+            if (data.placement) document.getElementById("placement").innerText = `#${data.placement}`;
+
+            // Top tracks list
+            let rank = 0, last_count = null;
+            const max_value = Math.max(...data.top_tracks.map((x) => x.count));
+            for (const track of data.top_tracks) {
+                const show_rank = track.count === last_count ? "" : `#${rank + 1}`;
+                const q = `artist=${escape(query.artist)}&track=${escape(track.track)}`;
+                
+                // Create element
+                const element = document.createElement("tr");
+                element.classList.add("listrow", "associateicons", "mergeicons");
+                element.innerHTML = `
+                    <td class = "rank">${show_rank}</td>
+                    <td class = "icon">
+                        <div style = "background-image: url('/image?artist=${escape(query.artist)}&album=${escape(track.album)}');"></div>
+                    </td>
+                    <td class = "track">
+                        <span class = "artist_in_trackcolumn">
+                            <a href = "/artist?artist=${escape(query.artist)}">${query.artist}</a>
+                        </span> &#8211; 
+                        <a href = "/track?${q}">${track.track}</a>
+                    </td>
+                    <td class = "amount">
+                        <a href = "/scrobbles?${q}">${track.count}</a>
+                    </td>
+                    <td class = "bar">
+                        <a href = "/scrobbles?${q}">
+                            <div style = "width: ${(track.count / max_value) * 100}%;"></div>
+                        </a>
+                    </td>
+                `;
+                top_tracks.appendChild(element);
+
+                // Update rank every time (to match Maloja)
+                last_count = track.count;
+                rank++;
+            }
+        })();
+    </script>
+{% endblock %}

@@ -24,6 +24,7 @@ app.mount("/static", StaticFiles(
 def app_context(request: Request) -> Dict[str, Any]:
     return {
         "db": db,
+        "escape": lambda s: s.replace("\"", "\\\"").replace("'", "\\'"),
         "format_time": lambda t: format_timespan(time.time() - t, max_units = 1) + " ago"
     }
 
@@ -40,6 +41,10 @@ async def load_index(request: Request) -> HTMLResponse:
 @app.get("/about")
 async def load_about(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "about.jinja2")
+
+@app.get("/artist")
+async def load_artist(request: Request, artist: str) -> HTMLResponse:
+    return templates.TemplateResponse(request, "artist.jinja2", {"artist": artist})
 
 @app.get("/image")
 async def load_image(
