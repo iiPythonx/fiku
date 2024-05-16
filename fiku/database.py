@@ -126,11 +126,21 @@ class FikuDB():
     def get_pulse(
         self,
         lower_bound: int,
-        upper_bound: int
+        upper_bound: int,
+        artist: str | None = None,
+        album: str | None = None,
+        track: str | None = None
     ) -> int:
+        filters, bindings = "" if artist is None else "AND artist_name = ?", \
+            [lower_bound, upper_bound] if artist is None else [lower_bound, upper_bound, artist]
+
+        if (track or album):
+            filters += " AND {} = ?".format("track_name" if track is not None else "release_name")
+            bindings.append(track or album)
+
         self.cursor.execute(
-            "SELECT COUNT(*) FROM scrobbles WHERE listened_at BETWEEN ? and ?",
-            (lower_bound, upper_bound)
+            f"SELECT COUNT(*) FROM scrobbles WHERE listened_at BETWEEN ? and ? {filters}",
+            bindings
         )
         return self.cursor.fetchone()[0]
 

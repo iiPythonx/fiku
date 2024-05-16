@@ -32,6 +32,16 @@
     <table class = "list">
 		<tbody id = "top_tracks"></tbody>
     </table>
+
+    <!-- Pulse -->
+    <section data-item-type = "pulse" data-query = "&artist={{ escape(artist) }}" style = "grid-area: pulse;">
+        <h1><a href = "/pulse">Pulse</a></h1>
+        <span class = "stat-select" data-timespan = "day">12 days</span> |
+        <span class = "stat-select" data-timespan = "week">12 weeks</span> |
+        <span class = "stat-select" data-timespan = "month">12 months</span> |
+        <span class = "stat-select" data-timespan = "year">12 years</span>
+        <table class = "list"></table>
+    </section>
 {% endblock %}
 
 {#- JS -#}

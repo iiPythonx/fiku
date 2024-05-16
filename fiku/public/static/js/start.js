@@ -6,11 +6,12 @@ const show_stat = async (type, timespan) => {
     // Handle pulse
     if (type === "pulse") {
         const table = stat.parentElement.getElementsByTagName("table")[0];
-        table.innerHTML = "";
 
         // Make request
-        const resp = await (await fetch(`/api/pulse?timespan=${timespan}`)).json();
+        const resp = await (await fetch(`/api/pulse?timespan=${timespan}${stat.parentElement.getAttribute('data-query') || ''}`)).json();
         const max_value = Math.max(...resp.data.map((x) => x.value));
+
+        table.innerHTML = "";
         for (let obj of resp.data) {
             const row = document.createElement("tr");
             row.innerHTML = `

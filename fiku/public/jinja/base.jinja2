@@ -30,6 +30,7 @@
 
         <!-- JS -->
         <script>const query=new Proxy(new URLSearchParams(window.location.search),{get:(s,p)=>s.get(p)});const escape=(t)=>t.split("'").join("\\'").split("\"").join("\\\"");</script>
+        <script src = "/static/js/start.js"></script>
         {% block js %}{% endblock %}
     </body>
 </html>
